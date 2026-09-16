@@ -23,9 +23,9 @@ def central_difference(f: Any, *vals: Any, arg: int = 0, epsilon: float = 1e-6) 
     Returns:
         An approximation of $f'_i(x_0, \ldots, x_{n-1})$
     """
-    def _modify_arg(e):
+    def _der_arg(e):
         return [x + e if i == arg else x for i, x in enumerate(vals)]
-    return (f(*_modify_arg(epsilon)) - f(*vals))/epsilon
+    return (f(*_der_arg(epsilon)) - f(*_der_arg(-epsilon)))/(2*epsilon)
 
 
 variable_count = 1
@@ -66,12 +66,12 @@ def topological_sort(variable: Variable) -> Iterable[Variable]:
     topology = []
     visited = set()
     def visit(v: Variable):
-        if v.is_constant() or v in visited:
+        if v.is_constant() or v.unique_id in visited:
             return
         if not v.is_leaf():
             for parent in v.parents:
                 visit(parent)
-        visited.add(v)
+        visited.add(v.unique_id)
         topology.append(v)
     visit(variable)
     return topology
